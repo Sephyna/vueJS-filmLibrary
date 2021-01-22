@@ -13,9 +13,7 @@
     <br />
     <br />
     <!--    affichage du formulaire en lui passant en props le type de formulaire (action différente) et des datas d'un seul film-->
-    <ComponentForm
-      typeForm="editMovie"
-      :dataMovieToEdit="dataMovie">
+    <ComponentForm typeForm="editMovie" :dataMovieToEdit="dataMovie">
     </ComponentForm>
   </ComponentLayout>
 </template>
