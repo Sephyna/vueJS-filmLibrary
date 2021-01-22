@@ -18,7 +18,7 @@ const routes = [
     component: NewMovie
   },
   {
-    path: "/editer-film/id?::id?name::name?url::url?year::year",
+    path: "/editer-film/:id",
     name: "EditMovie",
     component: EditMovie
   }

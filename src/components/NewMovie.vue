@@ -1,5 +1,6 @@
 <template>
   <ComponentLayout title="Nouveau film">
+    <!--    affiche un formulaire en précisant la props du type de formulaire-->
     <ComponentForm typeForm="addMovie"></ComponentForm>
   </ComponentLayout>
 </template>

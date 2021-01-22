@@ -1,6 +1,8 @@
 <template>
+  <!--  v-bind pour passé la props title au Layout-->
   <componentLayout title="Filmothèque">
     <div class="background">
+      <!--      v-model : liaison de donnée bidirectionnelle -->
       <label for="search"></label>
       <input
         id="search"
@@ -11,8 +13,10 @@
       <br />
       <br />
       <br />
+      <!--      si les data son charger = affiche les films sinon "chargement"-->
       <div v-if="loadingData">
         <div class="wallpaper">
+          <!--          v-bind pour passé les props au component enfant-->
           <componentMovie
             v-for="movie in searchMovies"
             v-bind:key="movie.name"
@@ -22,21 +26,6 @@
             :nameMovie="movie.name"
           >
           </componentMovie>
-<!--          Avec les templates comme précédemment :-->
-<!--          <componentMovie-->
-<!--            v-for="movie in searchMovies"-->
-<!--            v-bind:key="movie.name"-->
-<!--            :idMovie="movie.id"-->
-<!--          >-->
-<!--            <template v-slot:imgMovie>-->
-<!--              <div-->
-<!--                class="image"-->
-<!--                :style="{ 'background-image': 'url(' + movie.url + ')' }"-->
-<!--              ></div>-->
-<!--            </template>-->
-<!--            <template v-slot:nameMovie> {{ movie.name }} </template>-->
-<!--            <template v-slot:yearMovie> {{ movie.year }} </template>-->
-<!--          </componentMovie>-->
         </div>
       </div>
       <div v-else>
@@ -66,6 +55,7 @@ export default {
   },
   components: { componentMovie, componentLayout },
   methods: {
+    // Collecte les film de l'api à la création du component
     collectMovies() {
       axios
         .get("https://movies-api.alexgalinier.now.sh/")
@@ -80,9 +70,11 @@ export default {
     }
   },
   computed: {
+    // permet d'ordoner les films via lodash
     orderedMovies: function() {
       return _.orderBy(this.movies, "name");
     },
+    // permet de rechercher les film via l'input search (v-model) en fonction de leur nom
     searchMovies() {
       return this.orderedMovies.filter(movie => {
         return movie.name

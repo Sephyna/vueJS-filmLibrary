@@ -13,6 +13,7 @@
 import componentHeader from "./Header";
 export default {
   name: "Layout",
+  // Attend le titre du component enfant pour le passer au header
   props: {
     title: {
       type: String,

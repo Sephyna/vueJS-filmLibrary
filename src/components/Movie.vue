@@ -1,6 +1,7 @@
 <template>
   <div class="movie">
-    <router-link :to="{ name: 'EditMovie', params: { id: idMovie, url:urlMovie, name:nameMovie, year:yearMovie } }">
+    <!--    rendu d'un film + id passé en parametre de la route-->
+    <router-link :to="{ name: 'EditMovie', params: { id: idMovie } }">
       <div
         class="image"
         :style="{ 'background-image': 'url(' + urlMovie + ')' }"
@@ -11,16 +12,6 @@
       </div>
     </router-link>
   </div>
-<!--  Avec les templates-->
-<!--  <div class="movie">-->
-<!--    <router-link :to="{ name: 'EditMovie', params: { id: idMovie } }">-->
-<!--      <div class="image"><slot name="imgMovie"></slot></div>-->
-<!--      <div class="infos">-->
-<!--        <p class="title"><slot name="nameMovie"></slot></p>-->
-<!--        <p class="date"><slot name="yearMovie"></slot></p>-->
-<!--      </div>-->
-<!--    </router-link>-->
-<!--  </div>-->
 </template>
 
 <script>
@@ -88,6 +79,4 @@ export default {
   color: hsla(0, 0%, 100%, 0.4);
   margin-left: 10px;
 }
-
-
 </style>

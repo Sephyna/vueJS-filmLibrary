@@ -1,17 +1,9 @@
 <template>
   <div class="formMovie">
+    <!--    au submit = lance la fonction checkForm-->
     <form @submit="checkForm" methode="post">
-      <!--        Sans les inputwitherror-->
-      <!--        <label for="name">Nom :</label>-->
-      <!--        <input type="text" name="name" id="name" v-model="form.name" />-->
-      <!--        <br />-->
-      <!--        <label for="img">Image :</label>-->
-      <!--        <input type="text" name="img" id="img" v-model="form.url" />-->
-      <!--        <br />-->
-      <!--        <label for="year">Année de sortie : </label>-->
-      <!--        <input type="number" name="year" id="year" v-model="form.year" />-->
-      <!--        <br />-->
-
+      <!--      On passe à chaque componentInput son label (affichage) ses erreurs, son id(code), son type, et
+      le v-model permet de modifier en temps réel la valeur entrée dans le componentinput pour le traiter dans ce component-->
       <ComponentInput
         label="Nom"
         :errors="errors.name"
@@ -35,21 +27,15 @@
       ></ComponentInput>
       <input type="submit" value="Ajouter" />
     </form>
+    <!--    affichage de différents messages-->
     <div v-if="successMsg">
       <b> {{ successMsg }} </b>
     </div>
     <div v-if="errorMsg">
       <b> {{ errorMsg }} </b>
     </div>
-    idMovie {{ idMovie }}
+    data {{ dataMovieToEdit }}
   </div>
-  <!--    for the day that i'll be smart >>" -->
-  <!--    <div v-for="(item, key) in form" v-bind:key="item">-->
-  <!--      <p>{{item}} {{key}}</p>-->
-  <!--      <ComponentInput-->
-  <!--        :id= item-->
-  <!--      ></ComponentInput>-->
-  <!--    </div>-->
 </template>
 
 <script>
@@ -63,6 +49,9 @@ export default {
     typeForm: {
       type: String,
       require: true
+    },
+    dataMovieToEdit: {
+      type: Object
     }
   },
   data() {
@@ -75,7 +64,7 @@ export default {
       successMsg: "",
       errorMsg: "",
       idMovie: "",
-      newMovieData: null,
+      movieNewData: null,
       movieData: null,
       form: {
         name: null,
@@ -86,13 +75,16 @@ export default {
   },
   components: { ComponentInput },
   methods: {
+    //fonction qui checkl es datas du formulaire
     checkForm(e) {
+      // si des erreurs préexiste (déjà réaliser une tentative) => le vide
       if (this.errors.length > 0);
       {
         this.errors.name = [];
         this.errors.url = [];
         this.errors.year = [];
       }
+      // différents checks
       if (!this.form.name) {
         this.errors.name.push("Un nom de film est requis.");
       }
@@ -117,23 +109,26 @@ export default {
       if (typeof this.form.year === !Number || this.form.year < 1891) {
         this.errors.year.push("L'année doit être une année valide.");
       }
-      // Pas d'erreur = envoie du formulaire à la BDD
+      // Pas d'erreur = créer un object movieNewData et l'envoie  pour la suite
       if (
         this.errors.name.length === 0 &&
         this.errors.url.length === 0 &&
         this.errors.year.length === 0
       ) {
         this.form.year = parseInt(this.form.year);
-        this.newMovieData = {
+        this.movieNewData = {
           name: this.form.name,
           url: this.form.url,
           year: this.form.year
         };
         //SI formulaire sur  la page d'ajout de film
         if (this.typeForm === "addMovie") {
-          this.addMovieDataBase(this.newMovieData);
-        } else if (this.typeForm === "editMovie") {
-          this.editMovieDataBase(this.newMovieData);
+          this.addMovieDataBase(this.movieNewData);
+        }
+        // Si formulaire sur la page d'édition d'un film
+        else if (this.typeForm === "editMovie") {
+          this.editMovieDataBase(this.movieNewData);
+          // Sinon problème car il manque la props typeForm
         } else {
           this.errorMsg = "Problème sur le site";
         }
@@ -143,11 +138,14 @@ export default {
         console.log("pasok");
         this.errorMsg = "Erreur dans vos datas";
       }
+      //Permet d'éviter au form de ne pas réaliser ses évenements par défaut
       e.preventDefault();
     },
+    //Permet de rediriger le form. params = nom de la route
     goTo(params) {
       this.$router.push({ name: params });
     },
+    //Permet d'ajouter le nouveau film dans la base de donnée et renvoie à la filmothèque
     addMovieDataBase(data) {
       axios
         .post("https://movies-api.alexgalinier.now.sh", data)
@@ -160,6 +158,7 @@ export default {
           this.errorMsg = "Erreur du serveur";
         });
     },
+    //Permet d'éditer un film et renvoie à la filmothèque
     editMovieDataBase(data) {
       console.log(data, this.idMovie);
       axios
@@ -174,7 +173,8 @@ export default {
         });
     }
   },
-  mounted() {
+  // à la création du component : si page d'éditier, récupère l'id dans l'url
+  created() {
     if (this.typeForm === "editMovie") {
       this.idMovie = this.$route.params.id;
     }

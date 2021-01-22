@@ -1,5 +1,6 @@
 <template>
   <header>
+    <!--    Titre de la page => Layout-->
     <h1><slot>Titre</slot></h1>
     <button>
       <router-link to="/nouveau-film">Ajouter un film</router-link>
