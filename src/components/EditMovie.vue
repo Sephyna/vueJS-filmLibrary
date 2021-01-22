@@ -51,7 +51,7 @@ export default {
         });
     }
   },
-  // DOTO : modifier l'édition à la création du formulaire : donne idMovie en fonction url et collecte le film
+  // modifier l'édition à la création du formulaire : donne idMovie en fonction url et collecte le film
   created() {
     this.idMovie = this.$route.params.id;
     this.collectMovie();

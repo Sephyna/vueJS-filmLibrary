@@ -51,7 +51,7 @@ export default {
       require: true
     },
     dataMovieToEdit: {
-      type: Object
+      type: Object,
     }
   },
   data() {
@@ -75,7 +75,7 @@ export default {
   },
   components: { ComponentInput },
   methods: {
-    //fonction qui checkl es datas du formulaire
+    //fonction qui check les datas du formulaire
     checkForm(e) {
       // si des erreurs préexiste (déjà réaliser une tentative) => le vide
       if (this.errors.length > 0);
@@ -84,7 +84,7 @@ export default {
         this.errors.url = [];
         this.errors.year = [];
       }
-      // différents checks
+      // différents checks et messages d'erreurs
       if (!this.form.name) {
         this.errors.name.push("Un nom de film est requis.");
       }
@@ -173,7 +173,7 @@ export default {
         });
     }
   },
-  // à la création du component : si page d'éditier, récupère l'id dans l'url
+  // MODIFY IDMOVIE à la création du component : si page d'éditier, récupère l'id dans l'url
   created() {
     if (this.typeForm === "editMovie") {
       this.idMovie = this.$route.params.id;

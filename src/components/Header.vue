@@ -3,6 +3,7 @@
     <!--    Titre de la page => Layout-->
     <h1><slot>Titre</slot></h1>
     <button>
+      <!--      bouton qui redirige vers l'ajoute d'un film-->
       <router-link to="/nouveau-film">Ajouter un film</router-link>
     </button>
   </header>

@@ -1,5 +1,5 @@
 <template>
-  <!--  récupère les data du form et écoute l'input pour emettre sa valeur au component formMovie-->
+  <!--  récupère les data du formMovie et écoute l'input pour emettre sa valeur au component formMovie-->
   <div class="inputWithError">
     <label v-bind:for="idInput">{{ label }}</label>
     <input
