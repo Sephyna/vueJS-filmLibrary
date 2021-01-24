@@ -6,8 +6,8 @@
 </template>
 
 <script>
-import ComponentLayout from "./Layout";
-import ComponentForm from "./FormMovie";
+import ComponentLayout from "@/components/Layout";
+import ComponentForm from "@/components/FormMovie";
 
 export default {
   name: "FormMovie",

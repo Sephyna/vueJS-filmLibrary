@@ -1,7 +1,7 @@
 <template>
   <div class="formMovie">
     <!--    au submit = lance la fonction checkForm-->
-    <form @submit="checkForm" methode="post">
+    <form @submit.prevent="checkForm" methode="post">
       <!--      On passe à chaque componentInput son label (affichage) ses erreurs, son id(code), son type, et
       le v-model permet de modifier en temps réel la valeur entrée dans le componentinput pour le traiter dans ce component-->
       <ComponentInput
@@ -10,6 +10,7 @@
         idInput="name"
         type="text"
         v-model="form.name"
+        :content="dataMovieToEdit.name"
       ></ComponentInput>
       <ComponentInput
         label="Image"
@@ -22,9 +23,10 @@
         label="Année de sortie"
         :errors="errors.year"
         idInput="year"
-        type="text"
+        type="number"
         v-model="form.year"
       ></ComponentInput>
+
       <input type="submit" value="Ajouter" />
     </form>
     <!--    affichage de différents messages-->
@@ -51,7 +53,7 @@ export default {
       require: true
     },
     dataMovieToEdit: {
-      type: Object,
+      type: Object
     }
   },
   data() {
@@ -64,7 +66,6 @@ export default {
       successMsg: "",
       errorMsg: "",
       idMovie: "",
-      movieNewData: null,
       movieData: null,
       form: {
         name: null,
@@ -75,8 +76,12 @@ export default {
   },
   components: { ComponentInput },
   methods: {
+    //petit fonction js pour savoir si une valeur est vraiment numérique
+    isNumeric(n) {
+      return !isNaN(parseFloat(n)) && isFinite(n);
+    },
     //fonction qui check les datas du formulaire
-    checkForm(e) {
+    checkForm() {
       // si des erreurs préexiste (déjà réaliser une tentative) => le vide
       if (this.errors.length > 0);
       {
@@ -95,18 +100,22 @@ export default {
         this.errors.year.push("Une année pour le film est requise.");
       }
       if (
-        typeof this.form.name === !Text ||
-        this.form.name <= 0 ||
-        this.form.name > 50
+        typeof this.form.name != "string" ||
+        this.form.name.length <= 0 ||
+        this.form.name.length > 50
       ) {
         this.errors.name.push(
           "Le titre du film doit être du texte ente 0 et 50 caractères."
         );
       }
-      if (typeof this.form.url === !Text) {
+      if (typeof this.form.url != "string") {
         this.errors.url.push("L'image doit être un lien.");
       }
-      if (typeof this.form.year === !Number || this.form.year < 1891) {
+      if (
+        this.isNumeric(this.form.year) === false ||
+        this.form.year < 1891 ||
+        this.form.year > 2100
+      ) {
         this.errors.year.push("L'année doit être une année valide.");
       }
       // Pas d'erreur = créer un object movieNewData et l'envoie  pour la suite
@@ -139,7 +148,7 @@ export default {
         this.errorMsg = "Erreur dans vos datas";
       }
       //Permet d'éviter au form de ne pas réaliser ses évenements par défaut
-      e.preventDefault();
+      // e.preventDefault();
     },
     //Permet de rediriger le form. params = nom de la route
     goTo(params) {
@@ -171,12 +180,20 @@ export default {
           console.log(error);
           this.errorMsg = "Erreur du serveur";
         });
+    },
+    collectDataBrotherComponent() {
+      this.idMovie = this.$route.params.id;
+      this.form.name = this.dataMovieToEdit.name;
+      this.form.url = this.dataMovieToEdit.url;
+      this.form.year = this.dataMovieToEdit.year;
     }
   },
   // MODIFY IDMOVIE à la création du component : si page d'éditier, récupère l'id dans l'url
-  created() {
+  mounted() {
     if (this.typeForm === "editMovie") {
-      this.idMovie = this.$route.params.id;
+      this.collectDataBrotherComponent();
+      console.log(this.dataMovieToEdit);
+      console.log(this.form.year);
     }
   }
 };

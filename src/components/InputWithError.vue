@@ -6,7 +6,7 @@
       v-bind:type="type"
       v-bind:name="idInput"
       v-bind:id="idInput"
-      v-bind:value="value"
+      v-bind:value="content"
       v-on:input="$emit('input', $event.target.value)"
     />
     <div v-if="errors.length">
@@ -37,8 +37,9 @@ export default {
       type: String,
       require: true
     },
-    value: {
-      default: ""
+    content: {
+      type: String,
+      require: false
     }
   }
 };

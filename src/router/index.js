@@ -1,8 +1,8 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Filmoteque from "../components/Filmoteque.vue";
-import NewMovie from "@/components/NewMovie";
-import EditMovie from "@/components/EditMovie";
+import Filmoteque from "@/views/Filmoteque.vue";
+import NewMovie from "@/views/NewMovie";
+import EditMovie from "@/views/EditMovie";
 
 Vue.use(VueRouter);
 
@@ -20,7 +20,8 @@ const routes = [
   {
     path: "/editer-film/:id",
     name: "EditMovie",
-    component: EditMovie
+    component: EditMovie,
+    props: true
   }
   // ,
   // {

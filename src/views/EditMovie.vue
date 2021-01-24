@@ -4,7 +4,7 @@
     <!--    affichage du film à editer-->
     <componentMovie
       v-if="dataMovie"
-      :idMovie="dataMovie.id"
+      :idMovie="idMovie"
       :urlMovie="dataMovie.url"
       :yearMovie="dataMovie.year"
       :nameMovie="dataMovie.name"
@@ -19,17 +19,18 @@
 </template>
 
 <script>
-import ComponentLayout from "./Layout";
-import ComponentForm from "./FormMovie";
-import ComponentMovie from "./Movie";
+import ComponentLayout from "@/components/Layout";
+import ComponentForm from "@/components/FormMovie";
+import ComponentMovie from "@/components/Movie";
 import axios from "axios";
 
 export default {
   name: "EditMovie",
   data() {
     return {
+      idMovie: null,
       title: "",
-      dataMovie: null
+      dataMovie: {}
     };
   },
   components: { ComponentLayout, ComponentForm, ComponentMovie },
