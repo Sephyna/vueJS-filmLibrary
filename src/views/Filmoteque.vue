@@ -2,18 +2,42 @@
   <!--  v-bind pour passé la props title au Layout-->
   <componentLayout title="Filmothèque">
     <div class="background">
-      <!--      v-model : liaison de donnée bidirectionnelle -->
+      <!--     Recherche (v-model : liaison de donnée bidirectionnelle) -->
       <label for="search"></label>
       <input
         id="search"
         type="text"
         v-model="inputSearch"
-        placeholder="Search movie.."
+        placeholder="Search movie..."
       />
       <br />
+      <!--      classement de rechercher : par nom/année et par ordre croissant/décroissant-->
+      <div class="sort">
+        <label for="sort-by">Trier les résultats par :</label>
+        <select id="sort-by" v-model="sortPicked">
+          <option value="name">Nom</option>
+          <option value="year">Année</option>
+        </select>
+        <span class="order-by">
+          <input
+            type="radio"
+            id="increasing"
+            value="increasing"
+            v-model="sortOrderBy"
+          />
+          <label for="increasing">⮝</label>
+          <input
+            type="radio"
+            id="descending"
+            value="descending"
+            v-model="sortOrderBy"
+          />
+          <label for="descending">⮟</label>
+        </span>
+      </div>
       <br />
       <br />
-      <!--      si les data son charger = affiche les films sinon "chargement"-->
+      <!--      si les data son charger = affiche les films sinon affiche erreur si pas de connexion à bdd sinon affiche chargement-->
       <div v-if="loadedData">
         <div class="wallpaper">
           <!--          v-bind pour passé les props au component enfant-->
@@ -53,6 +77,8 @@ export default {
       loadedData: false,
       loadedError: false,
       inputSearch: "",
+      sortPicked: "name",
+      sortOrderBy: "increasing",
       title: ""
     };
   },
@@ -73,25 +99,21 @@ export default {
     }
   },
   computed: {
-    // permet d'ordonner les films via lodash et croissant/décroissant nom/année
-    orderedMoviesByNameIncreasing: function() {
-      return _.orderBy(this.movies, "name");
-    },
-    orderedMoviesNameDescending: function() {
-      return _.orderBy(this.movies, "name").reverse();
-    },
-    orderedMoviesByYearIncreasing: function() {
-      return _.orderBy(this.movies, "year");
-    },
-    orderedMoviesYearDescending: function() {
-      return _.orderBy(this.movies, "year").reverse();
+    //ordonne les films en fonction des choix sélectionnés
+    orderMovie() {
+      if (this.sortOrderBy === "increasing") {
+        return _.orderBy(this.movies, this.sortPicked);
+      } else {
+        return _.orderBy(this.movies, this.sortPicked).reverse();
+      }
     },
     // permet de rechercher les film via l'input search (v-model) en fonction de leur nom
     searchMovies() {
-      return this.orderedMoviesYearDescending.filter(movie => {
-        return movie.name
-          .toLowerCase()
-          .includes(this.inputSearch.toLowerCase());
+      return this.orderMovie.filter(movie => {
+        return (
+          movie.name.toLowerCase().includes(this.inputSearch.toLowerCase()) ||
+          movie.year.toLowerCase().includes(this.inputSearch.toLowerCase())
+        );
       });
     }
   },
@@ -123,5 +145,22 @@ export default {
   background: rgba(0, 0, 0, 0.2);
   color: hsla(0, 0%, 100%, 0.7);
   font-size: 16px;
+}
+.sort {
+  text-align: right;
+  line-height: 150%;
+  margin: 15px;
+}
+.order-by > input {
+  visibility: hidden;
+}
+
+.order-by > label {
+  font-weight: bold;
+  font-size: 200%;
+}
+.order-by input[type="radio"]:checked + label {
+  color: #161a33;
+  text-shadow: 0 1px 0 white, 0 -1px 0 white;
 }
 </style>
