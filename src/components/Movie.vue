@@ -31,7 +31,7 @@ export default {
       require: true
     },
     yearMovie: {
-      type: String,
+      // type: String,
       require: true
     }
   }

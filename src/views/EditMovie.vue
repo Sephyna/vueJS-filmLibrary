@@ -13,8 +13,18 @@
     <br />
     <br />
     <!--    affichage du formulaire en lui passant en props le type de formulaire (action différente) et des datas d'un seul film-->
-    <ComponentForm typeForm="editMovie" :dataMovieToEdit="dataMovie">
+    <ComponentForm
+      :dataMovieToEdit="dataMovie"
+      @clickFormChecked="editMovieDatabase"
+    >
     </ComponentForm>
+    <!--    affichage de différents messages-->
+    <div v-if="successMsg">
+      <b> {{ successMsg }} </b>
+    </div>
+    <div v-if="errorMsg">
+      <b> {{ errorMsg }} </b>
+    </div>
   </ComponentLayout>
 </template>
 
@@ -30,7 +40,9 @@ export default {
     return {
       idMovie: null,
       title: "",
-      dataMovie: {}
+      dataMovie: {},
+      successMsg: null,
+      errorMsg: null
     };
   },
   components: { ComponentLayout, ComponentForm, ComponentMovie },
@@ -48,7 +60,25 @@ export default {
           }
         })
         .catch(error => {
+          this.errorMsg = "erreur du serveur";
           console.log(error);
+        });
+    },
+    //Permet de rediriger le form. params = nom de la route
+    goTo(params) {
+      this.$router.push({ name: params });
+    },
+    //Permet d'éditer un film et renvoie à la filmothèque
+    editMovieDatabase: function(data) {
+      axios
+        .put(`https://movies-api.alexgalinier.now.sh/${this.idMovie}`, data)
+        .then(() => {
+          this.successMsg = "Film bien modifié";
+          this.goTo("Filmoteque");
+        })
+        .catch(error => {
+          console.log(error);
+          this.errorMsg = "Erreur du serveur";
         });
     }
   },

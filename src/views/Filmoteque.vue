@@ -28,8 +28,11 @@
           </componentMovie>
         </div>
       </div>
+      <div v-else-if="loadedError">
+        Connexion avec la base de donnée échouée
+      </div>
       <div v-else>
-        Chargement .....
+        Chargement ....
       </div>
     </div>
   </componentLayout>
@@ -70,13 +73,22 @@ export default {
     }
   },
   computed: {
-    // permet d'ordoner les films via lodash
-    orderedMovies: function() {
+    // permet d'ordonner les films via lodash et croissant/décroissant nom/année
+    orderedMoviesByNameIncreasing: function() {
       return _.orderBy(this.movies, "name");
+    },
+    orderedMoviesNameDescending: function() {
+      return _.orderBy(this.movies, "name").reverse();
+    },
+    orderedMoviesByYearIncreasing: function() {
+      return _.orderBy(this.movies, "year");
+    },
+    orderedMoviesYearDescending: function() {
+      return _.orderBy(this.movies, "year").reverse();
     },
     // permet de rechercher les film via l'input search (v-model) en fonction de leur nom
     searchMovies() {
-      return this.orderedMovies.filter(movie => {
+      return this.orderedMoviesYearDescending.filter(movie => {
         return movie.name
           .toLowerCase()
           .includes(this.inputSearch.toLowerCase());

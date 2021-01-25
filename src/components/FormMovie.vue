@@ -18,6 +18,7 @@
         idInput="url"
         type="text"
         v-model="form.url"
+        :content="dataMovieToEdit.url"
       ></ComponentInput>
       <ComponentInput
         label="Année de sortie"
@@ -25,6 +26,7 @@
         idInput="year"
         type="number"
         v-model="form.year"
+        :content="dataMovieToEdit.year"
       ></ComponentInput>
 
       <input type="submit" value="Ajouter" />
@@ -36,24 +38,18 @@
     <div v-if="errorMsg">
       <b> {{ errorMsg }} </b>
     </div>
-    data {{ dataMovieToEdit }}
   </div>
 </template>
 
 <script>
-import axios from "axios";
-
 import ComponentInput from "./InputWithError";
 
 export default {
   name: "FormMovie",
   props: {
-    typeForm: {
-      type: String,
-      require: true
-    },
     dataMovieToEdit: {
-      type: Object
+      type: Object,
+      require: false
     }
   },
   data() {
@@ -65,8 +61,6 @@ export default {
       },
       successMsg: "",
       errorMsg: "",
-      idMovie: "",
-      movieData: null,
       form: {
         name: null,
         url: null,
@@ -83,11 +77,16 @@ export default {
     //fonction qui check les datas du formulaire
     checkForm() {
       // si des erreurs préexiste (déjà réaliser une tentative) => le vide
-      if (this.errors.length > 0);
-      {
+      if (this.errors) {
         this.errors.name = [];
         this.errors.url = [];
         this.errors.year = [];
+      }
+      //Pour chaque prop du formulaire => si des préexiste (dataMovieToEdit) et que l'input du form est vide, alors attribué la valeur préexistante
+      for (const prop in this.form) {
+        if (this.dataMovieToEdit[prop] && !this.form[prop]) {
+          this.form[prop] = this.dataMovieToEdit[prop];
+        }
       }
       // différents checks et messages d'erreurs
       if (!this.form.name) {
@@ -118,82 +117,31 @@ export default {
       ) {
         this.errors.year.push("L'année doit être une année valide.");
       }
-      // Pas d'erreur = créer un object movieNewData et l'envoie  pour la suite
+
+      // Pas d'erreur = créer un object movieNewData et l'envoie au component parent (edit ou new movie)
       if (
         this.errors.name.length === 0 &&
         this.errors.url.length === 0 &&
         this.errors.year.length === 0
       ) {
         this.form.year = parseInt(this.form.year);
-        this.movieNewData = {
+        const movieNewData = {
           name: this.form.name,
           url: this.form.url,
           year: this.form.year
         };
-        //SI formulaire sur  la page d'ajout de film
-        if (this.typeForm === "addMovie") {
-          this.addMovieDataBase(this.movieNewData);
-        }
-        // Si formulaire sur la page d'édition d'un film
-        else if (this.typeForm === "editMovie") {
-          this.editMovieDataBase(this.movieNewData);
-          // Sinon problème car il manque la props typeForm
-        } else {
-          this.errorMsg = "Problème sur le site";
-        }
-      }
-      // Sinon rien ne se passe
-      else {
-        console.log("pasok");
-        this.errorMsg = "Erreur dans vos datas";
+        console.log(movieNewData);
+        // this.$emit("clickFormChecked", movieNewData);
+      } else {
+        this.form = {
+          name: null,
+          url: null,
+          year: null
+        };
+        this.errorMsg = "Data non envoyé";
       }
       //Permet d'éviter au form de ne pas réaliser ses évenements par défaut
       // e.preventDefault();
-    },
-    //Permet de rediriger le form. params = nom de la route
-    goTo(params) {
-      this.$router.push({ name: params });
-    },
-    //Permet d'ajouter le nouveau film dans la base de donnée et renvoie à la filmothèque
-    addMovieDataBase(data) {
-      axios
-        .post("https://movies-api.alexgalinier.now.sh", data)
-        .then(() => {
-          this.successMsg = "Film bien ajouter";
-          this.goTo("Filmoteque");
-        })
-        .catch(error => {
-          console.log(error);
-          this.errorMsg = "Erreur du serveur";
-        });
-    },
-    //Permet d'éditer un film et renvoie à la filmothèque
-    editMovieDataBase(data) {
-      console.log(data, this.idMovie);
-      axios
-        .put("https://movies-api.alexgalinier.now.sh" + this.idMovie, data)
-        .then(() => {
-          this.successMsg = "Film bien modifié";
-          this.goTo("Filmoteque");
-        })
-        .catch(error => {
-          console.log(error);
-          this.errorMsg = "Erreur du serveur";
-        });
-    },
-    collectDataBrotherComponent() {
-      this.idMovie = this.$route.params.id;
-      this.form.name = this.dataMovieToEdit.name;
-      this.form.url = this.dataMovieToEdit.url;
-      this.form.year = this.dataMovieToEdit.year;
-    }
-  },
-  // MODIFY IDMOVIE à la création du component : si page d'éditier, récupère l'id dans l'url
-  mounted() {
-    if (this.typeForm === "editMovie") {
-      this.collectDataBrotherComponent();
-      console.log(this.dataMovieToEdit);
-      console.log(this.form.year);
     }
   }
 };
