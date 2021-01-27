@@ -131,7 +131,7 @@ export default {
           year: this.form.year
         };
         console.log(movieNewData);
-        // this.$emit("clickFormChecked", movieNewData);
+        this.$emit("clickFormChecked", movieNewData);
       } else {
         this.form = {
           name: null,
