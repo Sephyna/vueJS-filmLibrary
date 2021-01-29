@@ -1,6 +1,6 @@
 <template>
   <div class="movie">
-    <!--    rendu d'un film + id passé en parametre de la route-->
+    <!--    rendu d'un film + id passé en paramètre de la route-->
     <router-link :to="{ name: 'EditMovie', params: { id: idMovie } }">
       <div
         class="image"
@@ -128,13 +128,16 @@ export default {
   -webkit-user-select: none; /* Chrome, Safari, Opéra depuis la version 15 */
   -ms-user-select: none; /* Internet explorer depuis la version 10 et Edge */
   user-select: none; /* Propriété standard */
+  position: relative;
+  top: -40px;
 }
 .favorite input {
   visibility: hidden;
+  display: none;
 }
 .favorite > label {
   font-weight: bold;
-  font-size: 200%;
+  font-size: 400%;
 }
 .favorite input[type="checkbox"]:checked + label {
   color: #161a33;

@@ -81,6 +81,8 @@ export default {
         this.errors.name = [];
         this.errors.url = [];
         this.errors.year = [];
+        this.errorMsg = "";
+        this.successMsg = "";
       }
       //Pour chaque prop du formulaire => si des préexiste (dataMovieToEdit) et que l'input du form est vide, alors attribué la valeur préexistante
       for (const prop in this.form) {

@@ -1,11 +1,29 @@
 <template>
   <div id="app">
-<!--    <div id="nav">-->
-<!--      <router-link to="/">Filmothèque</router-link> |-->
-<!--    </div>-->
+    <!--    <div id="nav">-->
+    <!--      <router-link to="/">Filmothèque</router-link> |-->
+    <!--    </div>-->
+    <ModaleComponent></ModaleComponent>
     <router-view />
   </div>
 </template>
+
+<script>
+import ModaleComponent from "./components/Modale";
+import { mapActions } from "vuex";
+
+export default {
+  components: { ModaleComponent },
+  methods: {
+    ...mapActions({
+      getMoviesWithFav: "getMoviesWithIsFavoriteKey" //films avec les favoris
+    })
+  },
+  mounted() {
+    this.getMoviesWithFav();
+  }
+};
+</script>
 
 <style>
 #app {
@@ -16,21 +34,19 @@
   color: #2c3e50;
 }
 
-#nav {
-  padding: 30px;
-}
+/*#nav {*/
+/*  padding: 30px;*/
+/*}*/
 
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
+/*#nav a {*/
+/*  font-weight: bold;*/
+/*  color: #2c3e50;*/
+/*}*/
 
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
+/*#nav a.router-link-exact-active {*/
+/*  color: #42b983;*/
+/*}*/
 </style>
-
-
 
 <!--SI LE LAYOUT ETAIT DANS TOUTE LES PAGES-->
 <!--<template>-->
@@ -82,6 +98,4 @@
 <!--#nav a.router-link-exact-active {-->
 <!--  color: #42b983;-->
 <!--}-->
-
-
 <!--</style>-->

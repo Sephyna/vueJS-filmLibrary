@@ -50,149 +50,99 @@
       <br />
       <br />
       <!--      si les data son charger = affiche les films sinon affiche erreur si pas de connexion à bdd sinon affiche chargement-->
-      <div v-if="loadedData">
+      <div v-if="this.movies.movies">
         <div class="wallpaper">
           <!--          v-bind pour passé les props au component enfant-->
           <componentMovie
-            v-for="movie in searchMovies"
+            v-for="movie in ListOfMoviesShow"
             v-bind:key="movie.name"
             :idMovie="movie.id"
             :urlMovie="movie.url"
             :yearMovie="movie.year"
             :nameMovie="movie.name"
             :isFavorite="movie.isFavorite"
-            @checked="toggleFavorites"
+            @checked="isFavorites"
           >
           </componentMovie>
         </div>
       </div>
-      <div v-else-if="loadedError">
-        Connexion avec la base de donnée échouée
-      </div>
       <div v-else>
         Chargement ....
+      </div>
+      <div v-if="this.movies.errors.loadBdd">
+        {{ this.movies.errors.loadBdd }}
       </div>
     </div>
   </componentLayout>
 </template>
 
 <script>
-import axios from "axios";
-import _ from "lodash";
-
 import componentMovie from "@/components/Movie";
 import componentLayout from "@/components/Layout";
+
+import { mapActions, mapState, mapGetters } from "vuex";
 
 export default {
   name: "Filmoteque",
   data() {
     return {
-      movies: [],
-      loadedData: false,
-      loadedError: false,
       inputSearch: "",
       sortPicked: "name",
       sortOrderBy: "increasing",
       title: "",
-      idFavoriteMovieTemp: [],
       checkedFavorites: false
     };
   },
   components: { componentMovie, componentLayout },
   methods: {
-    // Collecte les film de l'api à la création du component
-    collectMovies() {
-      axios
-        .get("https://movies-api.alexgalinier.now.sh/")
-        .then(response => {
-          this.movies = response.data;
-          this.loadedData = true;
-        })
-        .catch(error => {
-          console.log(error);
-          this.loadedError = true;
-        });
-    },
+    // initie au mounted l'action getMovies pour rechercher les movies de la bdd via vuex (store>modules>movies)
+    ...mapActions({
+      getMoviesWithFav: "getMoviesWithIsFavoriteKey" //films avec les favoris
+    }),
     // Fonction qui ajoute les films cochés et supprime les décochés du component Movies dans idFavoriteMovieTemp
     // Fait attention si le film n'est pas déjà présent dans le tableau idFavoriteMovieTemp
     // Ajoute ce tableau modifié dans le localStorage
-    toggleFavorites(movieChecked) {
-      let indexMovieInArray = this.idFavoriteMovieTemp.indexOf(movieChecked.id);
+    // /!\ comme c'est du temporaire, on ne le met pas dans vuex, parce qu'à la
+    // fermeture des onglets, on perd ce qu'il à modifier
+    // et nous on veut garder les datas modifier du storage
+    isFavorites(movieChecked) {
+      let indexMovieInArray = this.movies.arrayIdFavStorage.indexOf(
+        movieChecked.id
+      );
       if (movieChecked.value === true && indexMovieInArray < 0) {
-        this.idFavoriteMovieTemp.push(movieChecked.id);
+        this.movies.arrayIdFavStorage.push(movieChecked.id);
       } else if (movieChecked.value === false && indexMovieInArray >= 0) {
-        this.idFavoriteMovieTemp.splice(indexMovieInArray, 1);
+        this.movies.arrayIdFavStorage.splice(indexMovieInArray, 1);
       }
-      localStorage.setItem("favoritesMovies", this.idFavoriteMovieTemp);
+      localStorage.setItem(
+        "favoritesMovies",
+        this.movies.arrayIdFavStorage.toString()
+      );
+      this.getMoviesWithFav();
     }
   },
   computed: {
-    //function pour initialiser le tableau idFavoriteMovieTemp et qui soit égale à storage.favoritesMovies
-    idFavoriteMovieStorage() {
-      if (localStorage.getItem("favoritesMovies")) {
-        return localStorage.getItem("favoritesMovies").split(",");
-      } else {
-        return [];
-      }
-    },
-    //Ajouter la key isFavorite en fonction du tableau temporaire des favoris (= à celui du storage)
-    moviesWithIsFavoriteKey() {
-      let idFavs = this.idFavoriteMovieTemp;
-      let movies = this.movies;
-      return movies.map(function(movie) {
-        movie.isFavorite = false;
-        idFavs.find(function(idFav) {
-          if (movie.id === idFav) {
-            movie.isFavorite = true;
-          }
-        });
-        return movie;
-      });
-    },
-    //fonction qui cherche les films en favoris en fonction des id présent dans idFavoriteMovieTemp
-    favoritesMovies() {
-      return this.idFavoriteMovieTemp.map(favorite =>
-        this.moviesWithIsFavoriteKey.find(movie => movie.id === favorite)
+    //vuex : appel toutes les state de store>modules>movies après les actions
+    ...mapState(["movies"]),
+    //vuex: appel des getters de store>modules>movie
+    ...mapGetters({
+      listMovies: "listMovies"
+    }),
+    //on lui passe toutes les param nécessaire pour executer le getters listMovies
+    //et listOfMoviesShow sera appeler pour l'affichage
+    ListOfMoviesShow() {
+      return this.listMovies(
+        this.checkedFavorites,
+        this.sortOrderBy,
+        this.sortPicked,
+        this.inputSearch
       );
-    },
-    // choisi la liste des films afficher en fonction de l'option favori coché/décoché
-    listMovies() {
-      if (this.checkedFavorites) {
-        return this.favoritesMovies;
-      } else {
-        return this.moviesWithIsFavoriteKey;
-      }
-    },
-    //ordonne les films en fonction du choix croissant/décroissant sélectionnés
-    orderMovie() {
-      if (this.sortOrderBy === "increasing") {
-        return _.orderBy(this.listMovies, this.sortPicked);
-      } else {
-        return _.orderBy(this.listMovies, this.sortPicked).reverse();
-      }
-    },
-    // permet de rechercher les film via l'input search (v-model) en fonction de leur nom OU année
-    searchMovies() {
-      return this.orderMovie.filter(movie => {
-        return (
-          movie.name
-            .toString()
-            .toLowerCase()
-            .includes(this.inputSearch.toLowerCase()) ||
-          movie.year
-            .toString()
-            .toLowerCase()
-            .includes(this.inputSearch.toLowerCase())
-        );
-      });
     }
   },
   //après le template réalisé et les vm :
-  //recherche les films dans la bdd
-  //initie le tableau idFavoriteMovieTemp
+  //initie la liste de film avec les favoris
   mounted() {
-    this.collectMovies();
-    this.idFavoriteMovieTemp = this.idFavoriteMovieStorage;
+    // this.getMoviesWithFav();
   }
 };
 </script>
